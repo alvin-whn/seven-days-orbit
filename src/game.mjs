@@ -135,7 +135,7 @@ function resumeFlight() {
   if (!resumeGame(game)) return;
   // 重新建立帧基准并清空输入，避免暂停时长变成恢复后的模拟推进。
   // Reset the frame baseline and inputs so paused wall time never becomes simulation time on resume.
-  previousTime = performance.now(); keys.clear(); pointers.clear();
+  previousTime = performance.now(); lastStatus = 'playing'; keys.clear(); pointers.clear();
   pauseButton.setAttribute('aria-pressed','false');
   pauseButton.innerHTML = '暂停 <span aria-hidden="true">Ⅱ</span>';
   elements.overlay.hidden = true; elements['system-status'].textContent = 'FLIGHT IN PROGRESS';

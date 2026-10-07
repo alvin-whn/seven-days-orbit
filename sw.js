@@ -1,4 +1,4 @@
-const CACHE_NAME = 'seven-days-orbit-v1.0.0';
+const CACHE_NAME = 'seven-days-orbit-v1.0.0-release';
 const ASSETS = ['./','./index.html','./style.css','./favicon.svg','./src/game.mjs','./src/engine.mjs'];
 const ROOT = new URL('./',self.location.href);
 const allowed = new Set(ASSETS.map(asset => new URL(asset,ROOT).href));
@@ -14,7 +14,10 @@ self.addEventListener('fetch',event => {
   if (!allowed.has(url.href)) return;
   event.respondWith(fetch(event.request).then(response => {
     if (response.ok && response.type !== 'opaque') {
-      event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(url.href,response.clone())));
+      // 返回浏览器前克隆；缓存写入失败只影响离线更新，不阻断在线响应。
+      // Clone before returning to the browser; cache-write failure affects offline updates, not the online response.
+      const cachedResponse = response.clone();
+      event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(url.href,cachedResponse)).catch(() => {}));
     }
     return response;
   }).catch(() => caches.match(url.href).then(cached => cached || Response.error())));

@@ -8,5 +8,7 @@
 - Fix post-deadline damage and inconsistent collision/render scales using short simulation substeps.
 - 显式暂停/恢复与切换标签自动暂停；同源资源缓存支持首次加载后的离线刷新。
 - Explicit pause/resume, automatic pause on tab changes, and same-origin caching for offline reload after initial load.
+- 修复恢复首帧终局丢失与在线响应缓存竞态；新增实际模块会话与异步缓存回归。
+- Fix missing first-frame completion after resume and response-cache races; add real-module session and asynchronous cache regressions.
 - 纯 Node 自动测试、固定版本的 CI Actions、GitHub Pages 与允许清单静态发行包。
 - Dependency-free Node tests, pinned CI Actions, GitHub Pages, and allowlisted static release assets.
