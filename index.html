@@ -24,11 +24,11 @@
         <p class="intro-copy">加班七天，<br>也要留下漂亮轨迹。</p>
         <p class="intro-description">一艘飞船，七段航程。绕开生活的碎片，<br class="desktop-break">收集那些还在发光的小事。</p>
         <div class="flight-specs"><div><strong>84<span>s</span></strong><span>一次完整航程</span></div><div><strong>07</strong><span>逐渐加速的轨道</span></div><div><strong>03</strong><span>初始护盾</span></div></div>
-        <div class="controls-guide"><span class="guide-label">飞行指南 / CONTROLS</span><p><kbd>←</kbd><kbd>→</kbd><span>或</span><kbd>A</kbd><kbd>D</kbd><span>沿轨道转向</span></p><p class="touch-guide">触屏按住左 / 右按钮 · 绿色是星火，红色是碎片</p></div>
+        <div class="controls-guide"><span class="guide-label">飞行指南 / CONTROLS</span><p><kbd>←</kbd><kbd>→</kbd><span>或</span><kbd>A</kbd><kbd>D</kbd><span>沿轨道转向</span></p><p class="touch-guide">触屏按住左 / 右 · 空格暂停 · 绿色星火，红色碎片</p></div>
         <div class="signature"><span class="signature-line"></span><span>BUILT WITH AI · MADE FOR A BREAK</span></div>
       </div>
       <section class="game-panel" aria-label="七日轨道游戏">
-        <div class="panel-toolbar"><span><i class="live-dot"></i> FLIGHT DECK</span><span class="system-status" id="system-status">READY TO DEPART</span></div>
+        <div class="panel-toolbar"><span><i class="live-dot"></i> FLIGHT DECK</span><div class="toolbar-actions"><span class="system-status" id="system-status">READY TO DEPART</span><button class="pause-button" id="pause" type="button" aria-pressed="false" disabled>暂停 <span aria-hidden="true">Ⅱ</span></button></div></div>
         <div class="hud"><div><span>航程 / DAY</span><strong id="day">01<span>/ 07</span></strong></div><div class="hud-center"><span>星火 / SCORE</span><strong id="score">0000</strong></div><div class="hud-shield"><span>护盾 / SHIELD</span><strong id="shield" aria-label="3 个护盾">● ● ●</strong></div></div>
         <div class="arena" id="arena">
           <canvas id="universe" aria-label="飞船沿圆形轨道飞行，避开红色碎片并收集绿色星火"></canvas>
@@ -37,7 +37,7 @@
             <h2 id="overlay-title">给自己 84 秒。</h2>
             <p id="overlay-description">不赶进度，只管飞行。<br>三层护盾，陪你走完七天。</p>
             <button class="primary-button" id="start" type="button">开始航程 <span aria-hidden="true">↗</span></button>
-            <span class="overlay-footnote">无需下载 · 无需登录 · 成绩仅保存在此设备</span>
+            <span class="overlay-footnote">首次加载后可离线 · 无需登录 · 成绩仅保存在此设备</span>
           </div>
           <div class="collision-flash" id="flash" aria-hidden="true"></div>
         </div>
@@ -46,7 +46,7 @@
         <div class="panel-footer"><span>个人最佳 <strong id="best">0000</strong></span><span id="flight-note">所有伟大的出发，都从休息一会开始。</span></div>
       </section>
     </section>
-    <section class="field-notes" aria-label="游戏说明"><div><span class="note-index">01 / NAVIGATE</span><h3>保持流动</h3><p>绕着轨道转向，提前躲开迎面飞来的碎片。后半程会越来越快。</p></div><div><span class="note-index">02 / COLLECT</span><h3>收集星火</h3><p>每一颗绿色星火加 150 分。航行的每一秒，也会留下你的成绩。</p></div><div><span class="note-index">03 / COME BACK</span><h3>再飞一次</h3><p>走完七天即完成航程。失去全部护盾也没关系，下一次随时出发。</p></div></section>
+    <section class="field-notes" aria-label="游戏说明"><div><span class="note-index">01 / NAVIGATE</span><h3>保持流动</h3><p>绕着轨道转向，提前躲开迎面飞来的碎片。后半程会越来越快。</p></div><div><span class="note-index">02 / COLLECT</span><h3>收集星火</h3><p>每一颗绿色星火加 150 分。航行的每一秒，也会留下你的成绩。</p></div><div><span class="note-index">03 / TAKE A BREAK</span><h3>随时休息</h3><p>空格或暂停按钮停下；切换标签会自动暂停。休息完，再继续你的轨道。</p></div></section>
   </main>
   <footer class="site-footer"><span>SEVEN DAYS ORBIT <span class="footer-year">/ 2026</span></span><span>献给假期里依然认真工作的你。<span class="tiny-star">✦</span></span></footer>
   <p class="sr-only" id="announcement" aria-live="polite"></p>

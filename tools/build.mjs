@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root = fileURLToPath(new URL('../',import.meta.url));
 const output = path.join(root,'dist');
-const allowed = ['index.html','style.css','favicon.svg','src/game.mjs','src/engine.mjs'];
+const allowed = ['index.html','style.css','favicon.svg','sw.js','src/game.mjs','src/engine.mjs'];
 // 发布包采用显式允许清单；不复制测试、Git 元数据或运行日志。
 // Publish an explicit allowlist without copying tests, Git metadata, or runtime logs.
 await mkdir(path.join(output,'src'),{ recursive:true });
