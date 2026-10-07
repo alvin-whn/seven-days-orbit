@@ -15,6 +15,15 @@ export function createGame(random = Math.random) {
     lastHit: -Infinity, serial: 0, random };
 }
 
+export function pauseGame(game) {
+  if (game.status !== 'playing') return false;
+  game.status = 'paused'; return true;
+}
+export function resumeGame(game) {
+  if (game.status !== 'paused') return false;
+  game.status = 'playing'; return true;
+}
+
 // 半径以玩家轨道为 1，保持不同屏幕上的碰撞与速度合同一致。
 // Normalize the player's orbit radius to 1 so collision and speed contracts stay identical across screens.
 export function spawnObject(game) {

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, stepGame, difficultyForDay, angularDistance, wrapAngle, TAU, TOTAL_SECONDS } from '../src/engine.mjs';
+import { createGame, stepGame, pauseGame, resumeGame, difficultyForDay, angularDistance, wrapAngle, TAU, TOTAL_SECONDS } from '../src/engine.mjs';
 
 function playing() { const game = createGame(() => 0.5); game.status = 'playing'; game.spawnClock = 1000; return game; }
 test('angles wrap and collisions cross the zero-angle seam', () => {
@@ -53,4 +53,15 @@ test('separated sprite geometry does not produce a distant collision', () => {
   const game = playing(); game.angle = 0;
   game.objects = [{ angle:0.149,radius:1.08,energy:false }];
   stepGame(game,0.02); assert.equal(game.shields,3);
+});
+test('paused flights preserve time, score, shields, and object positions', () => {
+  const game = playing(); game.objects = [{ angle:game.angle,radius:1.5,energy:false }];
+  stepGame(game,0.05); const before = structuredClone({ elapsed:game.elapsed,score:game.score,shields:game.shields,objects:game.objects,angle:game.angle });
+  assert.equal(pauseGame(game),true); stepGame(game,30,1);
+  assert.deepEqual({ elapsed:game.elapsed,score:game.score,shields:game.shields,objects:game.objects,angle:game.angle },before);
+  assert.equal(resumeGame(game),true); stepGame(game,0.02); assert.ok(game.elapsed > before.elapsed);
+});
+test('pause and resume cannot resurrect a finished or unstarted flight', () => {
+  const game = createGame(); assert.equal(pauseGame(game),false); assert.equal(resumeGame(game),false);
+  game.status = 'lost'; assert.equal(pauseGame(game),false); assert.equal(resumeGame(game),false); assert.equal(game.status,'lost');
 });

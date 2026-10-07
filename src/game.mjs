@@ -1,4 +1,4 @@
-import { createGame, stepGame, TAU, TOTAL_SECONDS } from './engine.mjs';
+import { createGame, stepGame, pauseGame, resumeGame, TAU, TOTAL_SECONDS } from './engine.mjs';
 
 const $ = id => document.getElementById(id);
 const canvas = $('universe');
@@ -16,6 +16,7 @@ let lastStatus = 'ready';
 let lastDay = 1;
 const keys = new Set();
 const pointers = new Map();
+const pauseButton = $('pause');
 const stars = Array.from({ length: 90 }, (_, index) => ({ x: ((index * 137.507) % 997) / 997, y: ((index * 71.831) % 991) / 991, size: index % 5 === 0 ? 1.2 : 0.55, brightness: 0.12 + (index % 8) * 0.045 }));
 
 try { best = Math.max(0, Number(localStorage.getItem('seven-days-orbit:best')) || 0); } catch { /* 禁用存储仍可游玩。 / Play remains available when storage is disabled. */ }
@@ -113,21 +114,55 @@ function showResult() {
   elements.overlay.hidden = false;
   elements.announcement.textContent = `${won ? '航程完成' : '护盾耗尽'}。本次成绩 ${game.score}。`;
   keys.clear(); pointers.clear();
+  pauseButton.disabled = true;
+  pauseButton.setAttribute('aria-pressed','false');
 }
 
+function pauseFlight() {
+  if (!pauseGame(game)) return;
+  keys.clear(); pointers.clear();
+  pauseButton.setAttribute('aria-pressed','true');
+  pauseButton.innerHTML = '继续 <span aria-hidden="true">▷</span>';
+  elements['system-status'].textContent = 'TAKE YOUR TIME';
+  elements['overlay-kicker'].textContent = 'REST IS PART OF THE JOURNEY';
+  elements['overlay-title'].textContent = '你的轨道，等你回来。';
+  elements['overlay-description'].textContent = '时间、碎片和护盾都已停下。休息好了再继续。';
+  elements.start.innerHTML = '继续航程 <span aria-hidden="true">↗</span>';
+  elements.overlay.hidden = false;
+  elements.announcement.textContent = '已暂停。时间和护盾保持不变。';
+}
+function resumeFlight() {
+  if (!resumeGame(game)) return;
+  // 重新建立帧基准并清空输入，避免暂停时长变成恢复后的模拟推进。
+  // Reset the frame baseline and inputs so paused wall time never becomes simulation time on resume.
+  previousTime = performance.now(); keys.clear(); pointers.clear();
+  pauseButton.setAttribute('aria-pressed','false');
+  pauseButton.innerHTML = '暂停 <span aria-hidden="true">Ⅱ</span>';
+  elements.overlay.hidden = true; elements['system-status'].textContent = 'FLIGHT IN PROGRESS';
+  elements.announcement.textContent = '继续航程。';
+}
+pauseButton.addEventListener('click', () => game.status === 'paused' ? resumeFlight() : pauseFlight());
+
 elements.start.addEventListener('click', () => {
+  if (game.status === 'paused') { resumeFlight(); elements.start.blur(); return; }
   game = createGame(); game.status = 'playing'; lastStatus = 'playing'; lastDay = 1;
   keys.clear(); pointers.clear(); previousTime = performance.now();
   elements.overlay.hidden = true; elements['system-status'].textContent = 'FLIGHT IN PROGRESS';
   elements.announcement.textContent = '航程开始。使用左右方向键或 A、D 转向。';
   elements.start.blur(); updateHud();
+  pauseButton.disabled = false; pauseButton.setAttribute('aria-pressed','false');
+  pauseButton.innerHTML = '暂停 <span aria-hidden="true">Ⅱ</span>';
 });
 document.addEventListener('keydown', event => {
   const key = event.key.toLowerCase();
+  if ([' ','escape','p'].includes(key) && ['playing','paused'].includes(game.status)) {
+    event.preventDefault(); if (!event.repeat) game.status === 'paused' ? resumeFlight() : pauseFlight(); return;
+  }
   if (['arrowleft','arrowright','a','d'].includes(key) && game.status === 'playing') { event.preventDefault(); keys.add(key); }
 });
 document.addEventListener('keyup', event => keys.delete(event.key.toLowerCase()));
-window.addEventListener('blur', () => { keys.clear(); pointers.clear(); });
+window.addEventListener('blur', () => { keys.clear(); pointers.clear(); pauseFlight(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) pauseFlight(); });
 for (const [id,direction] of [['left',-1],['right',1]]) {
   const button = $(id);
   button.addEventListener('pointerdown', event => { event.preventDefault(); button.setPointerCapture(event.pointerId); pointers.set(event.pointerId,direction); });
@@ -141,9 +176,17 @@ function frame(time) {
   const touch = [...pointers.values()].reduce((sum,direction) => sum + direction,0);
   stepGame(game,dt,Math.max(-1,Math.min(1,keyboard + touch)));
   if (game.status === 'playing') updateHud();
-  else if (lastStatus === 'playing') { updateHud(); showResult(); }
+  else if (['lost','won'].includes(game.status) && lastStatus === 'playing') { updateHud(); showResult(); }
   lastStatus = game.status;
   draw(time);
   requestAnimationFrame(frame);
 }
 resize(); updateHud(); requestAnimationFrame(frame);
+
+// 可选的同源缓存只处理公开游戏资源；缓存故障不影响在线游玩。
+// Optional same-origin caching handles public game assets only; cache failures never prevent online play.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register(new URL('../sw.js',import.meta.url)).catch(() => {
+    elements['flight-note'].textContent = '当前浏览器未启用离线缓存，在线航程照常可玩。';
+  });
+}

@@ -15,7 +15,7 @@ test('local preview serves game assets and rejects private or unknown paths', as
       if (match) { clearTimeout(timeout); resolve(match[0]); }
     });
   });
-  for (const pathname of ['/','/style.css','/src/game.mjs','/src/engine.mjs','/favicon.svg']) {
+  for (const pathname of ['/','/style.css','/src/game.mjs','/src/engine.mjs','/favicon.svg','/sw.js']) {
     const response = await fetch(base + pathname); assert.equal(response.status,200,pathname);
     assert.equal(response.headers.get('x-content-type-options'),'nosniff');
   }
